@@ -1,0 +1,64 @@
+import numpy as np
+
+# Define the activation function
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# Define the neural network class
+class NeuralNetwork:
+
+    # Initialize the neural network
+    def __init__(self, num_inputs, num_hidden, num_outputs):
+        # Set the number of inputs, hidden units, and outputs
+        self.num_inputs = num_inputs
+        self.num_hidden = num_hidden
+        self.num_outputs = num_outputs
+
+        # Initialize the weights and biases
+        self.weights1 = np.random.rand(num_inputs, num_hidden)
+        self.biases1 = np.random.rand(num_hidden)
+        self.weights2 = np.random.rand(num_hidden, num_outputs)
+        self.biases2 = np.random.rand(num_outputs)
+
+    # Feed forward through the neural network
+    def forward_pass(self, inputs):
+        # Calculate the hidden layer activations
+        hidden_activations = sigmoid(np.dot(inputs, self.weights1) + self.biases1)
+
+        # Calculate the output layer activations
+        output_activations = sigmoid(np.dot(hidden_activations, self.weights2) + self.biases2)
+
+        return output_activations
+
+    # Train the neural network
+    def train(self, inputs, targets, learning_rate):
+        # Calculate the output layer activations
+        output_activations = self.forward_pass(inputs)
+
+        # Calculate the error
+        error = targets - output_activations
+        error = error.reshape(-1)
+
+        # Calculate the hidden layer error
+        hidden_error = np.dot(error, self.weights2.T) * output_activations * (1 - output_activations)
+
+        # Update the weights and biases
+        self.weights2 -= learning_rate * np.dot(output_activations.T, error)
+        self.biases2 -= learning_rate * error
+        self.weights1 -= learning_rate * np.dot(inputs.T, hidden_error)
+        self.biases1 -= learning_rate * hidden_error
+
+# Create a neural network
+neural_network = NeuralNetwork(2, 3, 1)
+
+# Train the neural network
+for i in range(10000):
+    # Generate some random inputs and targets
+    inputs = np.random.rand(1, 2) # changed to 2D array
+    targets = np.array([0.5])
+
+    # Train the neural network
+    neural_network.train(inputs, targets, 0.01)
+
+# Test the neural network
+print(neural_network.forward_pass(np.array([0.1, 0.2])))
